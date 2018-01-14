@@ -20,10 +20,10 @@ def reinitialize():
 def isNum(s): #Check if the input is an integer
     try:
         int(s)
-        print ("I'm an int!")
+        #print ("I'm an int!")
         return True
     except:
-        print ("I'm not an int!")
+        #print ("I'm not an int!")
         return False
 
 def incrementPlayerMatches(): #Keeps track of how many matches the player has made
@@ -39,9 +39,17 @@ def dealHands():
         playerHand.append(deck.getCard())
         computerHand.append(deck.getCard())
 
-def displayHand():
+def displayPHand():
+    print("")
+    print("Your hand is:")
     for card in playerHand:
         print(playerHand.index(card)+1,'\t',card)
+
+def displayCHand():
+    print("")
+    print("My hand is:")
+    for a in computerHand:
+        print(computerHand.index(a)+1, '\t',a)
 
 def win():
     global gameOn
@@ -50,6 +58,8 @@ def win():
     else:
         print("Congratulations, you won!")
     print("Good bye!")
+    gameOn='n'
+
     #i =input("Type y if you would like to play again and anything else to quit.")
     #if i=='y':
     #    reinitialize()
@@ -86,23 +96,16 @@ def checkMatchNum (hand, number):
     else:
         return True
 def choice1():
-    cardIndex = int(input("Please the number to the left of one of the cards in your pair."))
-    cardIndex = cardIndex - 1  # allow for starting with 0
-    print (playerHand[cardIndex]) #prints correct card
-    #print (deck.getCardNumber(playerHand[cardIndex])) #prints number of card
+    cardIndex = int(input("Please enter the number to the left of one of the cards in your pair."))
+    cardIndex = cardIndex - 1  # shift for index starting at 0
     matchNum = int(deck.getCardNumber(playerHand[cardIndex]))  # get the value of that card (eg. 13 for king)
-    #print (matchNum+"= what we send to checkMatch function")
     if checkMatch(playerHand, playerHand[cardIndex]):
-        # for card in playerHand: #check each card in the hand for matches with the specified number THIS SHOULD BE IT's OWN FUNCTION, could pass hand in question and use for both player and computer? then call if wrong card selected (see comment on line 110)
-        #    if (deck.getCardNumber(card)==matchNum) & (card !=playerHand[cardIndex]):
-        #        playerHand.remove(playerHand[cardIndex]) #remove this card first, because I have the index, which might change if you remove something else from the list
-        #        playerHand.remove(card)
         makeMatch(playerHand, matchNum)
         incrementPlayerMatches()
-        if (len(playerHand) == 0) | (len(computerHand) == 0) | (deck.getLength() == 0) | (computerMatches > 14):
+        if (len(playerHand)==0) | (len(computerHand)==0) | (deck.getLength()==0) | (computerMatches>14 | (playerMatches>14)):
             win()
         else:
-            displayHand()
+            displayPHand()
             input("Type any key to end your turn.")
             return
     elif not checkMatch(playerHand, matchNum): #if no match for chosen card, try again.
@@ -124,39 +127,48 @@ def choice2():
         cardRequest(choice)
 
 
-def makeMatch (hand, card):
+def makeMatch (hand, card):  #Only use after verifying that match exists
     removed = 0
+    c=list()
     while removed <2:
         for i in hand:
             if deck.getCardNumber(i) == int(card):
+                c.append(i)
                 hand.remove(i)
                 removed= removed + 1
+    #TODO Check if this works or makes trouble.
+    if removed !=2: #in case there isn't a match (this should never happen, but who knows?)
+        print("no match found.")
+        for a in c:
+            hand.append(a)
 
-def cardRequest(choice): #choice is an integer entered by player
-    #used when the player requests a card from the computer.  Not working right now (3:44 pm 1/12/18)
-    # TODO: does not return card that is actually present in computer hand.
+def cardRequest(choice): #choice is an integer entered by player representing the number of the card they hope to receive
      choice=int(choice)
+     #print("choice is ",choice)
      if checkMatchNum(computerHand,choice):
+         print("I have that card.  Here you go.")
          removed=0
          while removed < 1:
              for a in computerHand:
-
                  if deck.getCardNumber(a)== choice:
                      playerHand.append(a)
                      computerHand.remove(a)
-                     if checkMatchNum(playerHand,choice):
-                         makeMatch(playerHand,choice)
+                     m=isMatch(playerHand)
+                     if m>0:
+                         makeMatch(playerHand,m)
                          incrementPlayerMatches()
                          print("You made a match!")
-                         if (len(playerHand) == 0) | (len(computerHand) == 0) | (deck.getLength() == 0) | (
-                             computerMatches > 14):
+                         if (len(playerHand)==0) | (len(computerHand)==0) | (deck.getLength()==0) | (computerMatches>14 | (playerMatches>14)):
                              win()
                      removed=removed+1
+             break
      else:
          input("I do not have that card. Type any key to Go Fish.")
-         playerHand.append(deck.getCard())
+         c=deck.getCard()
+         playerHand.append(c)
+         print ("\n You drew a "+c)
 
-     displayHand()
+
      input("Type any key to end your turn.")
      return
 
@@ -167,42 +179,49 @@ def computerTurn():
     print('You have ', playerMatches, ' matches so far.')
     print("Now it's the computer's turn.")
 
+    displayCHand()
 
-    for a in computerHand:
-        print(a)
-    if (len(playerHand)==0) | (len(computerHand)==0) | (deck.getLength()==0) | (computerMatches>14):
+    if (len(playerHand)==0) | (len(computerHand)==0) | (deck.getLength()==0) | (computerMatches>14 | (playerMatches>14)):
         win()
     else:
     #while (len(computerHand) !=0) & (len(deck) !=0) & (computerMatches <27):#if 27 or greater, there is no possibility of computer loosing
         #TODO: check matches with function
-        #for card in computerHand:  # check each card in the hand for matches
-        #    for c in computerHand:
-        #        if (deck.getCardNumber(card)==deck.getCardNumber(c)) & (card !=c): #if you have a match
-        #            computerHand.remove(card)
-        #            computerHand.remove(c)
         card=isMatch(computerHand)
         if card >0:
             makeMatch(computerHand, card)
             incrementComputerMatches()
-            if (len(computerHand) == 0) | (deck.getLength() == 0) | (computerMatches > 14):
+            if (len(playerHand)==0) | (len(computerHand)==0) | (deck.getLength()==0) | (computerMatches>14 | (playerMatches>14)):
                 win()
             else:
                 print("The computer made a match! Now it's your turn.")
             return
         else: #no match
             reqInd=random.randint (0,(len(computerHand)-1))#get random index for card request
-            print("there are ",len(computerHand), " cards in the computer's hand. Index for req is ", reqInd)
+            #print("there are ",len(computerHand), " cards in the computer's hand. Index for reqInd is ", reqInd)
             request=deck.getCardNumber(computerHand[reqInd])
-            ans=input("Do you have a "+ str( request)+"? Type y if you do, anything else if you don't.") #ask about a random card from hand
+            #TODO: test the following to see if it produces the desired output (ie names face cards.)Maybe make into seperate function?
+            requestCard=''
+            if request==11:
+                requestCard=' Jack'
+            elif request==12:
+                requestCard=' Queen'
+            elif request==13:
+                requestCard=' King'
+            elif request==1:
+                requestCard='n Ace'
+            else:
+                requestCard=" "+str(request)
+            ans=input("Do you have a"+ requestCard +"? Type y if you do, anything else if you don't.") #ask about a random card from hand
             if ans=='y': #if player does have requested card
-                computerHand.remove(computerHand[reqInd]) #changed from reqInd to computerHand[reqInd]
+                print("Thank you!")
                 for c in playerHand:
-                    print("current card is ",c)
+                    #print("current card is ",c)
                     if deck.getCardNumber(c)==request:
+                        computerHand.append(c)
                         playerHand.remove(c)
                         makeMatch(computerHand,deck.getCardNumber(c))
                         incrementComputerMatches()
-                        if (len(computerHand) == 0) | (deck.getLength() == 0) | (computerMatches > 14):
+                        if (len(playerHand)==0) | (len(computerHand)==0) | (deck.getLength()==0) | (computerMatches>14 | (playerMatches>14)):
                             win()
                         else:
                             return
@@ -211,15 +230,14 @@ def computerTurn():
                 return
 
 def playerTurn():
-    if (len(playerHand)==0) | (len(computerHand)==0) | (deck.getLength()==0) | (playerMatches>14):
+    if (len(playerHand)==0) | (len(computerHand)==0) | (deck.getLength()==0) | (computerMatches>14 | (playerMatches>14)):
         win()
     else:
     #while (len(playerHand) !=0) & (len(deck) !=0) & (playerMatches <27):#if 27 or greater, there is no possibility of player loosing
         print(" ")
         print('The computer has ',computerMatches, ' matches so far.')
         print('You have ',playerMatches,' matches so far.')
-        print("Your hand is: ")
-        displayHand()
+        displayPHand()
         action = input("To play a matching pair, type 1.  To request a card from the computer, type 2.")
         if (action == '1'):
             choice1()
@@ -228,11 +246,13 @@ def playerTurn():
             choice2()
 
 def main ():
+    global gameOn
     gameOn=input("Would you like to play Go Fish? Type y to play.")
     if gameOn=='y':
         dealHands()
     while gameOn=='y':
         playerTurn()
         computerTurn()
+
 
 main()

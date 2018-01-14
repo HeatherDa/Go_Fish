@@ -14,10 +14,8 @@ class Deck:
                  'King \u2663': 13}
 
         possibleCards = list(self.cards.keys())
-        print(possibleCards)
         import random
         shuffledDeck = list()
-        # while len(possibleCards)!=0:
         for a in self.cards:
             y = random.randint(0, (len(possibleCards) - 1))  ##generating numbers higher than expected range
             shuffledDeck.append(possibleCards[y])
@@ -25,7 +23,7 @@ class Deck:
 
         self.deck= shuffledDeck
 
-    def pDeck(self):
+    def pDeck(self): #useful for debugging
         for i in self.deck:
             print(i)
 
@@ -35,15 +33,12 @@ class Deck:
         return card
 
     def getCardNumber(self, card):
-        #print(self.cards.get(card)," should be the number of this card")
         return int(self.cards.get(card))
 
     def shufDeck(self):
         possibleCards=list(self.cards.keys())
-        print(possibleCards)
         import random
         shuffledDeck = list()
-        # while len(possibleCards)!=0:
         y = random.randint(0, (len(self.cards.keys()) - 1))  ##generating numbers higher than expected range
         shuffledDeck.append(possibleCards[y])
         possibleCards.remove(possibleCards[y])
