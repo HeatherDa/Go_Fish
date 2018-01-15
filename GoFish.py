@@ -23,7 +23,7 @@ def isNum(s): #Check if the input is an integer
         #print ("I'm an int!")
         return True
     except:
-        #print ("I'm not an int!")
+        print ("Please enter an integer")
         return False
 
 def incrementPlayerMatches(): #Keeps track of how many matches the player has made
@@ -55,18 +55,12 @@ def win():
     global gameOn
     if computerMatches>playerMatches:
         print("The computer won. Better luck next time.")
-    else:
+    elif playerMatches>computerMatches:
         print("Congratulations, you won!")
+    elif playerMatches==computerMatches:
+        print("We tied!  Good job.")
     print("Good bye!")
     gameOn='n'
-
-    #i =input("Type y if you would like to play again and anything else to quit.")
-    #if i=='y':
-    #    reinitialize()
-    #    return
-    #else:
-    #    gameOn='n'
-    #    return
 
 def isMatch(hand):
     for card in hand:
@@ -117,15 +111,15 @@ def choice1():
 
 def choice2():
     print("Cards can be requested by typing a number, 1-13.  An Ace is 1, a King is 13.")
-    choice = input("Type in the number of the card you want.")
+    #choice = input("Type in the number of the card you want.")
 
-    if (isNum(choice)):
-        cardRequest(choice)
-
-    else:
-        choice = input("Please enter a number between 1 and 13.")
-        cardRequest(choice)
-
+    while True:
+        choice = input("Type in the number of the card you want.")
+        if ((isNum(choice)) & (int(choice)>0) & (int(choice)<14)):
+            cardRequest(int(choice))
+            break
+        elif isNum(choice)==False | (int(choice)<1) | (int(choice)>13):
+            print("Please enter an integer between 1 and 13.")
 
 def makeMatch (hand, card):  #Only use after verifying that match exists
     removed = 0
@@ -166,7 +160,7 @@ def cardRequest(choice): #choice is an integer entered by player representing th
          input("I do not have that card. Type any key to Go Fish.")
          c=deck.getCard()
          playerHand.append(c)
-         print ("\n You drew a "+c)
+         print ("\nYou drew a "+c)
 
 
      input("Type any key to end your turn.")
@@ -179,13 +173,11 @@ def computerTurn():
     print('You have ', playerMatches, ' matches so far.')
     print("Now it's the computer's turn.")
 
-    displayCHand()
-
     if (len(playerHand)==0) | (len(computerHand)==0) | (deck.getLength()==0) | (computerMatches>14 | (playerMatches>14)):
         win()
     else:
-    #while (len(computerHand) !=0) & (len(deck) !=0) & (computerMatches <27):#if 27 or greater, there is no possibility of computer loosing
-        #TODO: check matches with function
+        #TODO Turn off displayCHand for final version.  Useful for debugging.
+        displayCHand()
         card=isMatch(computerHand)
         if card >0:
             makeMatch(computerHand, card)
@@ -230,6 +222,7 @@ def computerTurn():
                 return
 
 def playerTurn():
+    global gameOn
     if (len(playerHand)==0) | (len(computerHand)==0) | (deck.getLength()==0) | (computerMatches>14 | (playerMatches>14)):
         win()
     else:
@@ -238,12 +231,18 @@ def playerTurn():
         print('The computer has ',computerMatches, ' matches so far.')
         print('You have ',playerMatches,' matches so far.')
         displayPHand()
-        action = input("To play a matching pair, type 1.  To request a card from the computer, type 2.")
-        if (action == '1'):
-            choice1()
+        action=''
+        while (action !='1') & (action !='2') & (action !='EXIT'):
+            action = input("To play a matching pair, type 1.  To request a card from the computer, type 2. To end game, type EXIT.")
 
-        elif (action == '2'):
-            choice2()
+            if (action == '1'):
+                choice1()
+
+            elif (action == '2'):
+                choice2()
+
+            elif (action == 'EXIT'):
+                gameOn='n'
 
 def main ():
     global gameOn
