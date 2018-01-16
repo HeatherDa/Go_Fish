@@ -17,25 +17,28 @@ class Deck:
         import random
         shuffledDeck = list()
         for a in self.cards:
-            y = random.randint(0, (len(possibleCards) - 1))  ##generating numbers higher than expected range
+            y = random.randint(0, (len(possibleCards) - 1))
             shuffledDeck.append(possibleCards[y])
             possibleCards.remove(possibleCards[y])
 
         self.deck= shuffledDeck
 
-    def pDeck(self): #useful for debugging
+    def pDeck(self):
+        '''Print Deck.  Useful for debugging'''
         for i in self.deck:
             print(i)
 
     def getCard(self):
-        #self.pDeck()
+        '''Get a card from the deck.  Returns a card for dealing or "go fish".'''
         card=self.deck.pop(0)
         return card
 
     def getCardNumber(self, card):
+        '''Takes card and returns number of card.'''
         return int(self.cards.get(card))
 
     def shufDeck(self):
+        '''Make randomized deck of cards.'''
         possibleCards=list(self.cards.keys())
         import random
         shuffledDeck = list()
@@ -45,4 +48,5 @@ class Deck:
         return shuffledDeck
 
     def getLength(self):
+        '''Returns number of cards that are left in the deck.'''
         return len(self.deck)

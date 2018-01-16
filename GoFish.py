@@ -10,6 +10,7 @@ Deck.shufDeck(deck)
 gameOn=""
 
 def reinitialize():
+    '''Could use this to clear all variables and start a new game.  Game not currently set up to do this.'''
     global playerMatches
     global computerMatches
     playerHand.clear()
@@ -17,7 +18,9 @@ def reinitialize():
     computerHand.clear()
     computerMatches = 0
 
-def isNum(s): #Check if the input is an integer
+def isNum(s):
+    '''Check if the input is an integer.
+        Return True if it is and False if it isn't.'''
     try:
         int(s)
         #print ("I'm an int!")
@@ -26,32 +29,51 @@ def isNum(s): #Check if the input is an integer
         print ("Please enter an integer")
         return False
 
-def incrementPlayerMatches(): #Keeps track of how many matches the player has made
+def incrementPlayerMatches():
+    '''Keeps track of how many matches the player has made'''
     global playerMatches
     playerMatches=playerMatches+1
 
-def incrementComputerMatches(): #Keeps track of how many matches the computer has made
+def incrementComputerMatches():
+    '''Keeps track of how many matches the computer has made'''
     global computerMatches
     computerMatches=computerMatches+1
 
 def dealHands():
+    '''Deal 5 cards to each player.'''
     for i in range(0, 5):  ##five cards in starting hand
         playerHand.append(deck.getCard())
         computerHand.append(deck.getCard())
 
 def displayPHand():
+    '''Display Player's hand for player's reference.'''
     print("")
     print("Your hand is:")
     for card in playerHand:
         print(playerHand.index(card)+1,'\t',card)
 
 def displayCHand():
+    '''Display computer's hand.  Useful for debugging.  Turn off for actual game play.'''
     print("")
     print("My hand is:")
     for a in computerHand:
         print(computerHand.index(a)+1, '\t',a)
 
+def requestFormat(request):
+    '''Format string output for computer card requests.'''
+    if request == 11:
+        return ' Jack'
+    elif request == 12:
+        return ' Queen'
+    elif request == 13:
+        return ' King'
+    elif request == 1:
+        return 'n Ace'
+    else:
+        return " " + str(request)
+
 def win():
+    '''Congratulate winner(s) and end game.'''
     global gameOn
     if computerMatches>playerMatches:
         print("The computer won. Better luck next time.")
@@ -63,6 +85,8 @@ def win():
     gameOn='n'
 
 def isMatch(hand):
+    '''Checks a hand for the presence of two or more cards with the same number.
+        Returns card number of the matching cards.'''
     for card in hand:
         for cardB in hand:
             if (deck.getCardNumber(card)==deck.getCardNumber(cardB)) & (card != cardB):
@@ -70,6 +94,8 @@ def isMatch(hand):
     return 0
 
 def checkMatch (hand, card):
+    '''Checks a hand for the presence of two cards of the number corresponding to the number of the card given.
+        Returns boolean: True if card is in hand, False if it is not.'''
     cards=0
     for i in hand:
         if deck.getCardNumber(i)==deck.getCardNumber(card):
@@ -81,6 +107,8 @@ def checkMatch (hand, card):
         return True
 
 def checkMatchNum (hand, number):
+    '''Checks a hand for the presence of at least one card of a given card number.
+    Returns boolean: True if card is in hand, False if it is not.'''
     cards=0
     for i in hand:
         if deck.getCardNumber(i)==int(number):
@@ -90,6 +118,7 @@ def checkMatchNum (hand, number):
     else:
         return True
 def choice1():
+    '''Player chooses to play a pair.'''
     cardIndex = int(input("Please enter the number to the left of one of the cards in your pair."))
     cardIndex = cardIndex - 1  # shift for index starting at 0
     matchNum = int(deck.getCardNumber(playerHand[cardIndex]))  # get the value of that card (eg. 13 for king)
@@ -110,8 +139,8 @@ def choice1():
             choice1()
 
 def choice2():
+    '''Player decides to request card from computer.'''
     print("Cards can be requested by typing a number, 1-13.  An Ace is 1, a King is 13.")
-    #choice = input("Type in the number of the card you want.")
 
     while True:
         choice = input("Type in the number of the card you want.")
@@ -121,7 +150,8 @@ def choice2():
         elif isNum(choice)==False | (int(choice)<1) | (int(choice)>13):
             print("Please enter an integer between 1 and 13.")
 
-def makeMatch (hand, card):  #Only use after verifying that match exists
+def makeMatch (hand, card):
+    '''Removes match from hand and adds to score.  Only use after verifying that a match exists'''
     removed = 0
     c=list()
     while removed <2:
@@ -130,15 +160,10 @@ def makeMatch (hand, card):  #Only use after verifying that match exists
                 c.append(i)
                 hand.remove(i)
                 removed= removed + 1
-    #TODO Check if this works or makes trouble.
-    if removed !=2: #in case there isn't a match (this should never happen, but who knows?)
-        print("no match found.")
-        for a in c:
-            hand.append(a)
 
-def cardRequest(choice): #choice is an integer entered by player representing the number of the card they hope to receive
+def cardRequest(choice):
+     '''Checks computer hand for a card corresponding to an integer chosen by the player.'''
      choice=int(choice)
-     #print("choice is ",choice)
      if checkMatchNum(computerHand,choice):
          print("I have that card.  Here you go.")
          removed=0
@@ -168,6 +193,7 @@ def cardRequest(choice): #choice is an integer entered by player representing th
 
 
 def computerTurn():
+    '''Computer's turn to play'''
     print(" ")
     print('The computer has ', computerMatches, ' matches so far.')
     print('You have ', playerMatches, ' matches so far.')
@@ -189,25 +215,11 @@ def computerTurn():
             return
         else: #no match
             reqInd=random.randint (0,(len(computerHand)-1))#get random index for card request
-            #print("there are ",len(computerHand), " cards in the computer's hand. Index for reqInd is ", reqInd)
             request=deck.getCardNumber(computerHand[reqInd])
-            #TODO: test the following to see if it produces the desired output (ie names face cards.)Maybe make into seperate function?
-            requestCard=''
-            if request==11:
-                requestCard=' Jack'
-            elif request==12:
-                requestCard=' Queen'
-            elif request==13:
-                requestCard=' King'
-            elif request==1:
-                requestCard='n Ace'
-            else:
-                requestCard=" "+str(request)
-            ans=input("Do you have a"+ requestCard +"? Type y if you do, anything else if you don't.") #ask about a random card from hand
+            ans=input("Do you have a"+ requestFormat(request) +"? Type y if you do, anything else if you don't.") #ask about a random card from hand
             if ans=='y': #if player does have requested card
                 print("Thank you!")
                 for c in playerHand:
-                    #print("current card is ",c)
                     if deck.getCardNumber(c)==request:
                         computerHand.append(c)
                         playerHand.remove(c)
@@ -222,11 +234,11 @@ def computerTurn():
                 return
 
 def playerTurn():
+    '''Player's turn to play.  Also provides oportunity for player to quit in the middle of the game.'''
     global gameOn
     if (len(playerHand)==0) | (len(computerHand)==0) | (deck.getLength()==0) | (computerMatches>14 | (playerMatches>14)):
         win()
     else:
-    #while (len(playerHand) !=0) & (len(deck) !=0) & (playerMatches <27):#if 27 or greater, there is no possibility of player loosing
         print(" ")
         print('The computer has ',computerMatches, ' matches so far.')
         print('You have ',playerMatches,' matches so far.')
